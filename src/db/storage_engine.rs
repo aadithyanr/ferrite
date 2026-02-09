@@ -47,4 +47,8 @@ impl StorageEngine {
             .map_err(|e| format!("Deserialization error: {:?}", e))?;
         Ok(StorageEngine { tables })
     }
+
+    pub fn get_table(&self, name: &str) -> Option<&Table> {
+        self.tables.get(name)
+    }
 }
