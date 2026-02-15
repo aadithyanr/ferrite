@@ -14,7 +14,7 @@ a minimal database written in rust from scratch
 
 ## demo
 
-https://github.com/aadithyanr/attachments/assets/demo.mov
+https://github.com/user-attachments/assets/e1c7e536-6671-4383-b105-79942806c7bf
 
 ## how it works
 
