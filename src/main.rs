@@ -24,7 +24,7 @@ fn main() -> Result<(), String> {
     let mut row2 = Row::new();
     row2.set("id".to_string(), "2".to_string());
     row2.set("name".to_string(), "test user".to_string());
-    row2.set("email".to_string(), "test@example.com".to_string());
+    row2.set("email".to_string(), "test@somethingidk.com".to_string());
     filesystem.insert_row("users", row2)?;
 
     let mut row3 = Row::new();
@@ -94,12 +94,16 @@ fn tokenize(input: &str) -> Vec<Token> {
                 tokens.push(Token::Operator('*'));
             }
             _ => {
-                if word.contains('=') {
-                    let parts: Vec<&str> = word.split('=').collect();
-                    if parts.len() == 2 {
+                if word == "=" {
+                    tokens.push(Token::Operator('='));
+                } else if word.contains('=') {
+                    let parts: Vec<&str> = word.splitn(2, '=').collect();
+                    if parts.len() == 2 && !parts[0].is_empty() && !parts[1].is_empty() {
                         tokens.push(Token::Identifier(parts[0].to_string()));
                         tokens.push(Token::Operator('='));
                         tokens.push(Token::Identifier(parts[1].to_string()));
+                    } else {
+                        tokens.push(Token::Identifier(word.to_string()));
                     }
                 } else {
                     tokens.push(Token::Identifier(word.to_string()));
