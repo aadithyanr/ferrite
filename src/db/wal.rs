@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 use std::fs::{File, OpenOptions};
-use std::io::{Write, BufWriter, BufReader, Read, Seek, SeekFrom};
+use std::io::{Write, BufWriter, BufReader, Read};
 use std::path::PathBuf;
 use crate::db::schema::Row;
 
@@ -43,7 +43,7 @@ impl WAL {
     }
 
     pub fn append(&mut self, entry: WALEntry) -> Result<(), String> {
-        let encoded = bincode::encode_to_vec(&entry, bincode::config::standard())
+        let encoded = bincode::serialize(&entry)
             .map_err(|e| format!("wal encode error: {:?}", e))?;
 
         let len = encoded.len() as u32;
@@ -82,7 +82,7 @@ impl WAL {
             reader.read_exact(&mut buffer)
                 .map_err(|e| format!("wal read error: {:?}", e))?;
 
-            let (entry, _) = bincode::decode_from_slice(&buffer, bincode::config::standard())
+            let entry: WALEntry = bincode::deserialize(&buffer)
                 .map_err(|e| format!("wal decode error: {:?}", e))?;
 
             entries.push(entry);

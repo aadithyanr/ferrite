@@ -1,7 +1,7 @@
 use crate::db::storage_engine::StorageEngine;
 use crate::db::schema::Table;
 use std::collections::HashMap;
-use crate::db::query::{QueryPlan, Identifier, Filter};
+use crate::db::query::{QueryPlan, Filter};
 
 pub struct ExecutionEngine {
     storage_engine: StorageEngine,
@@ -10,6 +10,22 @@ pub struct ExecutionEngine {
 #[derive(Debug)]
 pub enum ExecutionError {
     TableNotFound(String),
+}
+
+impl std::fmt::Display for ExecutionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ExecutionError::TableNotFound(table) => write!(f, "table not found: {}", table),
+        }
+    }
+}
+
+impl std::error::Error for ExecutionError {}
+
+impl From<ExecutionError> for String {
+    fn from(e: ExecutionError) -> String {
+        e.to_string()
+    }
 }
 
 impl ExecutionEngine {

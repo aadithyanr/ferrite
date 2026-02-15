@@ -1,5 +1,4 @@
 use serde::{Serialize, Deserialize};
-use std::cmp::Ordering;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct BTreeIndex {
@@ -39,22 +38,23 @@ impl BTreeIndex {
     }
 
     pub fn insert(&mut self, key: String, row_id: usize) {
+        let order = self.order;
         if let Some(ref mut root) = self.root {
-            if root.is_full(self.order) {
+            if root.is_full(order) {
                 let mut new_root = Box::new(BTreeNode::new(false));
                 let old_root = self.root.take().unwrap();
                 new_root.children.push(old_root);
-                self.split_child(&mut new_root, 0);
+                Self::split_child(&mut new_root, 0, order);
                 self.root = Some(new_root);
             }
         }
 
         if let Some(ref mut root) = self.root {
-            self.insert_non_full(root, key, row_id);
+            Self::insert_non_full(order, root, key, row_id);
         }
     }
 
-    fn insert_non_full(&mut self, node: &mut Box<BTreeNode>, key: String, row_id: usize) {
+    fn insert_non_full(order: usize, node: &mut Box<BTreeNode>, key: String, row_id: usize) {
         let mut i = node.keys.len();
 
         if node.is_leaf {
@@ -72,20 +72,19 @@ impl BTreeIndex {
                 i -= 1;
             }
 
-            if node.children[i].is_full(self.order) {
-                self.split_child(node, i);
+            if node.children[i].is_full(order) {
+                Self::split_child(node, i, order);
                 if key > node.keys[i] {
                     i += 1;
                 }
             }
 
             let child = &mut node.children[i];
-            self.insert_non_full(child, key, row_id);
+            Self::insert_non_full(order, child, key, row_id);
         }
     }
 
-    fn split_child(&mut self, parent: &mut Box<BTreeNode>, index: usize) {
-        let order = self.order;
+    fn split_child(parent: &mut Box<BTreeNode>, index: usize, order: usize) {
         let full_child = &mut parent.children[index];
         let mut new_child = Box::new(BTreeNode::new(full_child.is_leaf));
 

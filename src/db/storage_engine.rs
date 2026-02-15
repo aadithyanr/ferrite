@@ -98,7 +98,7 @@ impl StorageEngine {
             indexes: self.indexes.clone(),
         };
         
-        let serialized = bincode::encode_to_vec(&data, bincode::config::standard())
+        let serialized = bincode::serialize(&data)
             .map_err(|e| format!("serialization error: {:?}", e))?;
         buffer.extend_from_slice(&serialized);
         Ok(())
@@ -111,7 +111,7 @@ impl StorageEngine {
             indexes: HashMap<String, HashMap<String, BTreeIndex>>,
         }
         
-        let (data, _): (SerializedData, _) = bincode::decode_from_slice(buffer, bincode::config::standard())
+        let data: SerializedData = bincode::deserialize(buffer)
             .map_err(|e| format!("deserialization error: {:?}", e))?;
         
         Ok(StorageEngine { 

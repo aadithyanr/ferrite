@@ -3,7 +3,7 @@ mod db;
 use db::storage_engine::FileSystem;
 use db::schema::Row;
 use db::parser::{Parser, Token};
-use db::query::{QueryPlan, Identifier};
+use db::query::QueryPlan;
 use db::executor::ExecutionEngine;
 
 fn main() -> Result<(), String> {
